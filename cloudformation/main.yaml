@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: This template create lambda function to destroy log files in S3 bucket on a schedule.
+
+Parameters:
+  Project:
+    Description: Enter project name.
+    Type: String
+    Default: "sample"
+
+  Environment:
+    Description: Select environment.
+    Type: String
+    Default: production
+    AllowedValues:
+      - production
+      - staging
+      - development
+
+  Function:
+    Description: Enter function name.
+    Type: String
+    Default: log_in_s3_bucket_destroyer
+
+  ExecutionSchedule:
+    Description: Enter execution schedule.(UTC)
+    Type: String
+    Default: "cron(0 16 1 * ? *)"
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic Settings
+        Parameters:
+          - Project
+          - Environment
+          - Function
+      - Label:
+          default: Lambda Settings
+        Parameters:
+          - ExecutionSchedule
+
+Mappings:
+  Environments:
+    production:
+      short: prd
+    staging:
+      short: stg
+    development:
+      short: dev
+
+Resources:
+  IAMRoleExecuteLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      Description: This role is used by Lambda to execute the function.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
+
+  IAMPolicyExecuteLambda:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:ListBucket"
+              - "s3:GetObject"
+              - "s3:DeleteObject"
+            Resource: "*"
+      Roles:
+        - !Ref IAMRoleExecuteLambda
+      # Tags:
+      #   - Key: Project
+      #     Value: !Sub ${Project}
+      #   - Key: Environment
+      #     Value: !Sub ${Environment}
+      #   - Key: Function
+      #     Value: !Sub ${Function}
+
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      # 一般設定
+      Description: This function delete log files in S3 bucket.
+      MemorySize: 128
+      EphemeralStorage:
+        Size: 512
+      Timeout: 3
+      SnapStart: # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/snapstart.html?icmpid=docs_lambda_help
+        ApplyOn: None
+      # アクセス制限
+      Role: !GetAtt IAMRoleExecuteLambda.Arn
+      # 環境変数
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+      PackageType: Zip
+      Code:
+        ZipFile: |
+          import json
+
+          def lambda_handler(event, context):
+              print(event)
+
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from Lambda!')
+              }
+      # ランタイム設定
+      Runtime: python3.12
+      Handler: index.lambda_handler
+      Architectures:
+        - x86_64
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      LoggingConfig:
+        LogGroup: !Ref LambdaLogGroup
+      Tags:
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - /aws/lambda/${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      RetentionInDays: 90
+      Tags:
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: events.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn: !GetAtt ExecutionEventRule.Arn
+
+  ExecutionEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub
+        - ${Project}_${Environment}_${Function}_execution
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      Description: !Sub This event rule execute ${Function}.
+      State: ENABLED
+      EventBusName: default
+      ScheduleExpression: !Sub ${ExecutionSchedule}
+      Targets:
+        - Id: !Sub
+          - ${Project}_${Environment}_${Function}_execution
+          - Project: !Ref Project
+            Environment: !FindInMap [Environments, !Ref Environment, short]
+            Function: !Ref Function
+          Arn: !GetAtt LambdaFunction.Arn
+      # Tags:
+      #   - Key: Project
+      #     Value: !Sub ${Project}
+      #   - Key: Environment
+      #     Value: !Sub ${Environment}
+      #   - Key: Function
+      #     Value: !Sub ${Function}
