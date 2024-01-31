@@ -21,7 +21,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   IAMPolicyExecuteLambda:
-    Type: AWS::IAM::Policy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
       PolicyName: log_in_s3_bucket_destroyer
       PolicyDocument:
