@@ -2,11 +2,31 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: ''
 
+Parameters:
+  Project:
+    Description: Enter project name.
+    Type: String
+    Default: ""
+
+  Environment:
+    Description: Enter environment.
+    Type: String
+    Default: production
+    AllowedValues:
+      - production
+      - staging
+      - development
+
+  Function:
+    Description: Enter function name.
+    Type: String
+    Default: log_in_s3_bucket_destroyer
+
 Resources:
   IAMRoleExecuteLambda:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: log_in_s3_bucket_destroyer
+      RoleName: !Sub ${Function}
       Description: This role is used by Lambda to execute the function.
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -23,7 +43,7 @@ Resources:
   IAMPolicyExecuteLambda:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: log_in_s3_bucket_destroyer
+      ManagedPolicyName: !Sub ${Function}
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -39,7 +59,7 @@ Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: log_in_s3_bucket_destroyer
+      FunctionName: !Sub ${Function}
       # 一般設定
       Description: This function delete log files in S3 bucket.
       MemorySize: 128
@@ -79,5 +99,12 @@ Resources:
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/lambda/log_in_s3_bucket_destroyer
+      LogGroupName: !Sub /aws/lambda/${Function}
       RetentionInDays: 90
+      Tags:
+      - Key: Project
+        Value: !Sub ${Project}
+      - Key: Environment
+        Value: !Sub ${Environment}
+      - Key: Function
+        Value: !Sub ${Function}
