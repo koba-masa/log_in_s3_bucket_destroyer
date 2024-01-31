@@ -2,10 +2,20 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: ''
 
-Conditions:
-  HasNot: !Equals [ 'true', 'false' ]
-
 Resources:
-  NullResource:
-    Type: 'Custom::NullResource'
-    Condition: HasNot
+  IAMRoleExecuteLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: log_in_s3_bucket_destroyer
+      Description: This role is used by Lambda to execute the function.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
