@@ -22,15 +22,24 @@ Parameters:
     Type: String
     Default: log_in_s3_bucket_destroyer
 
+  ExecutionSchedule:
+    Description: Enter execution schedule.(UTC)
+    Type: String
+    Default: "cron(0 16 1 * ? *)"
+
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Basic Information
+          default: Basic Settings
         Parameters:
           - Project
           - Environment
           - Function
+      - Label:
+          default: Lambda Settings
+        Parameters:
+          - ExecutionSchedule
 
 Mappings:
   Environments:
@@ -89,6 +98,14 @@ Resources:
             Resource: "*"
       Roles:
         - !Ref IAMRoleExecuteLambda
+      # Tags:
+      #   - Key: Project
+      #     Value: !Sub ${Project}
+      #   - Key: Environment
+      #     Value: !Sub ${Environment}
+      #   - Key: Function
+      #     Value: !Sub ${Function}
+
 
   LambdaFunction:
     Type: AWS::Lambda::Function
@@ -157,3 +174,38 @@ Resources:
           Value: !Sub ${Environment}
         - Key: Function
           Value: !Sub ${Function}
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: events.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceArn: !GetAtt ExecutionEventRule.Arn
+
+  ExecutionEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub
+        - ${Project}_${Environment}_${Function}_execution
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
+      Description: !Sub This event rule execute ${Function}.
+      State: ENABLED
+      EventBusName: default
+      ScheduleExpression: !Sub ${ExecutionSchedule}
+      Targets:
+        - Id: !Sub
+          - ${Project}_${Environment}_${Function}_execution
+          - Project: !Ref Project
+            Environment: !FindInMap [Environments, !Ref Environment, short]
+            Function: !Ref Function
+          Arn: !GetAtt LambdaFunction.Arn
+      # Tags:
+      #   - Key: Project
+      #     Value: !Sub ${Project}
+      #   - Key: Environment
+      #     Value: !Sub ${Environment}
+      #   - Key: Function
+      #     Value: !Sub ${Function}
