@@ -1,0 +1,2 @@
+# log_in_s3_bucket_destroyer
+AWS S3バケット内にて管理されているログファイルを削除する
