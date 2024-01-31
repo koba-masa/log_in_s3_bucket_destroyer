@@ -6,7 +6,7 @@ Parameters:
   Project:
     Description: Enter project name.
     Type: String
-    Default: ""
+    Default: "sample"
 
   Environment:
     Description: Select environment.
@@ -32,11 +32,24 @@ Metadata:
           - Environment
           - Function
 
+Mappings:
+  Environments:
+    production:
+      short: prd
+    staging:
+      short: stg
+    development:
+      short: dev
+
 Resources:
   IAMRoleExecuteLambda:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${Function}
+      RoleName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
       Description: This role is used by Lambda to execute the function.
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -60,7 +73,11 @@ Resources:
   IAMPolicyExecuteLambda:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: !Sub ${Function}
+      ManagedPolicyName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -76,7 +93,11 @@ Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub ${Function}
+      FunctionName: !Sub
+        - ${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
       # 一般設定
       Description: This function delete log files in S3 bucket.
       MemorySize: 128
@@ -123,7 +144,11 @@ Resources:
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${Function}
+      LogGroupName: !Sub
+        - /aws/lambda/${Project}_${Environment}_${Function}
+        - Project: !Ref Project
+          Environment: !FindInMap [Environments, !Ref Environment, short]
+          Function: !Ref Function
       RetentionInDays: 90
       Tags:
         - Key: Project
