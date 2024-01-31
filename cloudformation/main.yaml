@@ -39,6 +39,13 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
 
   IAMPolicyExecuteLambda:
     Type: AWS::IAM::ManagedPolicy
@@ -95,6 +102,13 @@ Resources:
         UpdateRuntimeOn: Auto
       LoggingConfig:
         LogGroup: !Ref LambdaLogGroup
+      Tags:
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
 
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
@@ -102,9 +116,9 @@ Resources:
       LogGroupName: !Sub /aws/lambda/${Function}
       RetentionInDays: 90
       Tags:
-      - Key: Project
-        Value: !Sub ${Project}
-      - Key: Environment
-        Value: !Sub ${Environment}
-      - Key: Function
-        Value: !Sub ${Function}
+        - Key: Project
+          Value: !Sub ${Project}
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: Function
+          Value: !Sub ${Function}
