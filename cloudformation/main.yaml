@@ -9,7 +9,7 @@ Parameters:
     Default: ""
 
   Environment:
-    Description: Enter environment.
+    Description: Select environment.
     Type: String
     Default: production
     AllowedValues:
@@ -21,6 +21,16 @@ Parameters:
     Description: Enter function name.
     Type: String
     Default: log_in_s3_bucket_destroyer
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic Information
+        Parameters:
+          - Project
+          - Environment
+          - Function
 
 Resources:
   IAMRoleExecuteLambda:
