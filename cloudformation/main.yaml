@@ -19,3 +19,20 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  IAMPolicyExecuteLambda:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: log_in_s3_bucket_destroyer
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:ListBucket"
+              - "s3:GetObject"
+              - "s3:DeleteObject"
+            Resource: "*"
+      Roles:
+        - !Ref IAMRoleExecuteLambda
+
