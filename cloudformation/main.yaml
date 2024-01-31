@@ -73,3 +73,11 @@ Resources:
         - x86_64
       RuntimeManagementConfig:
         UpdateRuntimeOn: Auto
+      LoggingConfig:
+        LogGroupName: !Ref LambdaLogGroup
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/log_in_s3_bucket_destroyer
+      RetentionInDays: 90
