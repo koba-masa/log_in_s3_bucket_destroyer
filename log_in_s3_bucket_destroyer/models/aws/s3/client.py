@@ -43,3 +43,10 @@ class Client(Base):
                 results.extend(response["Contents"])
 
         return results
+
+    def delete_objects(self, bucket: str, objects: List[str]) -> None:
+        if not len(objects) == 0:
+            self.client.delete_objects(
+                Bucket=bucket,
+                Delete={"Objects": [{"Key": object} for object in objects]},
+            )
