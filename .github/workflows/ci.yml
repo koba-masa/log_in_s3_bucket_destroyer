@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio123
+      AWS_DEFAULT_REGION: ap-northeast-1
+      AWS_EC2_METADATA_DISABLED: true
+      DUMMY_ENDPOINT_URL: http://localhost:9000
+      PYTHONPATH: log_in_s3_bucket_destroyer
+
+    services:
+      minio:
+        image: wktk/minio-server
+        ports:
+          - 9000:9000
+        env:
+          MINIO_ACCESS_KEY: ${{ env.AWS_ACCESS_KEY_ID }}
+          MINIO_SECRET_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Package
+        run: |
+            pip install poetry
+            poetry install
+
+      - name: Run Lint
+        run: |
+          poetry run mypy --explicit-package-bases .
+          poetry run ruff check .
+          poetry run black --check .
+
+      - name: Run test
+        run: |
+          aws --endpoint-url ${{ env.DUMMY_ENDPOINT_URL }} s3 mb s3://log-bucket-test
+          aws --endpoint-url ${{ env.DUMMY_ENDPOINT_URL }} s3 cp docker_files/minio/data s3://log-bucket-test --recursive
+          poetry run pytest
