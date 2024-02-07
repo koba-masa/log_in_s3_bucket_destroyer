@@ -1,7 +1,6 @@
 aws_access_key: minio
 aws_secret_access_key: minio123
 aws_endpoint_url: !ENV ${DUMMY_ENDPOINT_URL}
-aws_endpoint_url:
 
 logs:
   - bucket: log-bucket-test
