@@ -1,5 +1,6 @@
 from models import settings
 
+
 class Base:
     def endpoint_url(self) -> str:
         endpoint_url = settings.SETTINGS.get("aws_endpoint_url", None)

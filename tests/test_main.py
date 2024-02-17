@@ -6,6 +6,7 @@ from log_in_s3_bucket_destroyer import LogInS3BucketDestroyer
 
 TIMEZONE_JST = timezone(timedelta(hours=+9))
 
+
 @pytest.mark.parametrize(
     [
         "mock_data",
@@ -14,10 +15,22 @@ TIMEZONE_JST = timezone(timedelta(hours=+9))
     [
         pytest.param(
             [
-                {"Key": "logs/sample1.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0)},
-                {"Key": "logs/sample2.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1)},
-                {"Key": "logs/sample3.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2)},
-                {"Key": "logs/sample4.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3)},
+                {
+                    "Key": "logs/sample1.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0),
+                },
+                {
+                    "Key": "logs/sample2.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1),
+                },
+                {
+                    "Key": "logs/sample3.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2),
+                },
+                {
+                    "Key": "logs/sample4.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3),
+                },
             ],
             [
                 "logs/sample2.log",
@@ -25,7 +38,7 @@ TIMEZONE_JST = timezone(timedelta(hours=+9))
                 "logs/sample4.log",
             ],
         ),
-    ]
+    ],
 )
 def test_execute(mocker, upload_files, mock_data, expected):
     instance = LogInS3BucketDestroyer({}, {})
@@ -35,7 +48,9 @@ def test_execute(mocker, upload_files, mock_data, expected):
 
     instance.execute()
 
-    instance.s3_client.delete_objects.assert_called_once_with("log-bucket-test", expected)
+    instance.s3_client.delete_objects.assert_called_once_with(
+        "log-bucket-test", expected
+    )
 
 
 @pytest.mark.parametrize(
@@ -48,21 +63,44 @@ def test_execute(mocker, upload_files, mock_data, expected):
         pytest.param(
             30,
             [
-                {"Key": "logs/sample1.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0)},
-                {"Key": "logs/sample2.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1)},
-                {"Key": "logs/sample3.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2)},
-                {"Key": "logs/sample4.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3)},
+                {
+                    "Key": "logs/sample1.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0),
+                },
+                {
+                    "Key": "logs/sample2.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1),
+                },
+                {
+                    "Key": "logs/sample3.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2),
+                },
+                {
+                    "Key": "logs/sample4.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3),
+                },
             ],
-            [
-            ],
+            [],
         ),
         pytest.param(
             1,
             [
-                {"Key": "logs/sample1.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0)},
-                {"Key": "logs/sample2.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1)},
-                {"Key": "logs/sample3.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2)},
-                {"Key": "logs/sample4.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3)},
+                {
+                    "Key": "logs/sample1.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0),
+                },
+                {
+                    "Key": "logs/sample2.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1),
+                },
+                {
+                    "Key": "logs/sample3.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2),
+                },
+                {
+                    "Key": "logs/sample4.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3),
+                },
             ],
             [
                 "logs/sample2.log",
@@ -73,17 +111,29 @@ def test_execute(mocker, upload_files, mock_data, expected):
         pytest.param(
             2,
             [
-                {"Key": "logs/sample1.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0)},
-                {"Key": "logs/sample2.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1)},
-                {"Key": "logs/sample3.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2)},
-                {"Key": "logs/sample4.log", "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3)},
+                {
+                    "Key": "logs/sample1.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=0),
+                },
+                {
+                    "Key": "logs/sample2.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=1),
+                },
+                {
+                    "Key": "logs/sample3.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=2),
+                },
+                {
+                    "Key": "logs/sample4.log",
+                    "LastModified": datetime.now(TIMEZONE_JST) - timedelta(days=3),
+                },
             ],
             [
                 "logs/sample3.log",
                 "logs/sample4.log",
             ],
-        )
-    ]
+        ),
+    ],
 )
 def test_get_objects(mocker, retention, mock_data, expected_results):
     instance = LogInS3BucketDestroyer({}, {})

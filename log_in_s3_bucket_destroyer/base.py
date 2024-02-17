@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 
@@ -8,13 +7,16 @@ from datetime import datetime
 
 from models import settings
 
+
 class Base:
     LOG_DIR: str = "./tmp/log"
 
     def __init__(self, event: Any, context: Any) -> None:
         self.event = event
         self.context = context
-        settings.load_config(f"config/{os.environ.get('ENVIRONMENT', 'development')}.yaml")
+        settings.load_config(
+            f"config/{os.environ.get('ENVIRONMENT', 'development')}.yaml"
+        )
         self.logger = self.__initialize_log()
 
         self.logger.info(event)

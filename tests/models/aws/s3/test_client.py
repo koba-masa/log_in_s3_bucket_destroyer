@@ -1,5 +1,4 @@
 import pytest
-from typing import List
 from models.aws.s3 import Client
 
 
@@ -53,9 +52,7 @@ def test_init():
         ),
     ],
 )
-def test_list_object_v2(
-    upload_files, prefix, max_per_page, expected_results
-):
+def test_list_object_v2(upload_files, prefix, max_per_page, expected_results):
     upload_files(
         {
             "logs/sample1.log": "tests/files/models/aws/s3/delete/sample.log",
@@ -104,12 +101,10 @@ def test_list_object_v2(
                 "logs/sample3.log",
                 "logs/sample4.log",
             ],
-            [
-            ],
+            [],
         ),
         pytest.param(
-            [
-            ],
+            [],
             [
                 "logs/sample1.log",
                 "logs/sample2.log",
@@ -117,7 +112,7 @@ def test_list_object_v2(
                 "logs/sample4.log",
             ],
         ),
-    ]
+    ],
 )
 def test_delete_objects(upload_files, delete_objects, expected_results):
     upload_files(

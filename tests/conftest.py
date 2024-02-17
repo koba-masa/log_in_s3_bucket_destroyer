@@ -8,6 +8,7 @@ from models.aws.s3 import Client as S3Client
 os.environ["ENVIRONMENT"] = "test"
 settings.load_config("config/test.yaml")
 
+
 @pytest.fixture(scope="function")
 def upload_files():
     def _method(objects):

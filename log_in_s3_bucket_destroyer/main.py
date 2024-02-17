@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from . import Base
 from models import settings
@@ -20,7 +20,9 @@ class LogInS3BucketDestroyer(Base):
             retention = int(config["retention"])
 
             delete_files = self.get_objects(bucket, prefix, retention)
-            self.logger.info(f"bucket: {bucket}, prefix: {prefix}, retention: {retention}, delete_files: {len(delete_files)}")
+            self.logger.info(
+                f"bucket: {bucket}, prefix: {prefix}, retention: {retention}, delete_files: {len(delete_files)}"
+            )
             self.logger.debug(delete_files)
 
             if len(delete_files) > 0:
@@ -28,7 +30,7 @@ class LogInS3BucketDestroyer(Base):
 
         return {}
 
-    def get_objects(self, bucket: str, prefix: str, retention: int) -> Dict[str, datetime]:
+    def get_objects(self, bucket: str, prefix: str, retention: int) -> List[str]:
         results = []
 
         retention_date = datetime.now(self.TIMEZONE_JST) - timedelta(days=retention)
