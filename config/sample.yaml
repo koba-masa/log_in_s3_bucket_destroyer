@@ -1,0 +1,8 @@
+aws_access_key:
+aws_secret_access_key:
+aws_endpoint_url:
+
+logs:
+  - bucket:
+    prefix:
+    retention:  # days

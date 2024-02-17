@@ -11,6 +11,8 @@ services:
     working_dir: /app/log_in_s3_bucket_destroyer
     environment:
       PYTHONPATH: /app/log_in_s3_bucket_destroyer/log_in_s3_bucket_destroyer
+      LOG_LEVEL: DEBUG
+      ENVIRONMENT: development
       DUMMY_ENDPOINT_URL: http://minio:9000
       TZ: Asia/Tokyo
     tty: true
@@ -44,7 +46,7 @@ services:
       mc alias set s3 http://minio:9000 minio minio123;
       mc mb --region ap-northeast-1 s3/log-bucket-development;
       mc mb --region ap-northeast-1 s3/log-bucket-test;
-      mc cp --recursive /tmp/minio/data/* s3/log-bucket-test;
+      mc cp --recursive /tmp/minio/data/* s3/log-bucket-development;
       "
 
 volumes:
