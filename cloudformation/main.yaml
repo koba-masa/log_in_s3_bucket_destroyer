@@ -55,7 +55,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub
-        - ${Project}_${Environment}_${Function}
+        - ${Function}
         - Project: !Ref Project
           Environment: !FindInMap [Environments, !Ref Environment, short]
           Function: !Ref Function
@@ -83,7 +83,7 @@ Resources:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       ManagedPolicyName: !Sub
-        - ${Project}_${Environment}_${Function}
+        - ${Function}
         - Project: !Ref Project
           Environment: !FindInMap [Environments, !Ref Environment, short]
           Function: !Ref Function
@@ -111,7 +111,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Sub
-        - ${Project}_${Environment}_${Function}
+        - ${Function}
         - Project: !Ref Project
           Environment: !FindInMap [Environments, !Ref Environment, short]
           Function: !Ref Function
@@ -162,7 +162,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub
-        - /aws/lambda/${Project}_${Environment}_${Function}
+        - /aws/lambda/${Function}
         - Project: !Ref Project
           Environment: !FindInMap [Environments, !Ref Environment, short]
           Function: !Ref Function
@@ -187,7 +187,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Name: !Sub
-        - ${Project}_${Environment}_${Function}_execution
+        - ${Function}_execution
         - Project: !Ref Project
           Environment: !FindInMap [Environments, !Ref Environment, short]
           Function: !Ref Function
@@ -197,7 +197,7 @@ Resources:
       ScheduleExpression: !Sub ${ExecutionSchedule}
       Targets:
         - Id: !Sub
-          - ${Project}_${Environment}_${Function}_execution
+          - ${Function}_execution
           - Project: !Ref Project
             Environment: !FindInMap [Environments, !Ref Environment, short]
             Function: !Ref Function
