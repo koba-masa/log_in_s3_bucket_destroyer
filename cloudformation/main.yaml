@@ -129,6 +129,7 @@ Resources:
       Environment:
         Variables:
           LOG_LEVEL: INFO
+          ENVIRONMENT: !Ref Environment
       PackageType: Zip
       Code:
         ZipFile: |
