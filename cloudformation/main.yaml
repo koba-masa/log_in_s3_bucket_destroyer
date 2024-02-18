@@ -144,7 +144,7 @@ Resources:
               }
       # ランタイム設定
       Runtime: python3.12
-      Handler: log_in_s3_bucket_destroyer.main.lambda_handler
+      Handler: log_in_s3_bucket_destroyer.log_in_s3_bucket_destroyer.lambda_handler
       Architectures:
         - x86_64
       RuntimeManagementConfig:

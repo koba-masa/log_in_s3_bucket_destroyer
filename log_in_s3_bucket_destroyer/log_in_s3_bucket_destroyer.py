@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-from . import Base
+from base import Base
 from models import settings
 from models.aws.s3 import Client as S3Client
 
