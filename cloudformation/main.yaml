@@ -120,7 +120,7 @@ Resources:
       MemorySize: 128
       EphemeralStorage:
         Size: 512
-      Timeout: 3
+      Timeout: 600
       SnapStart: # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/snapstart.html?icmpid=docs_lambda_help
         ApplyOn: None
       # アクセス制限
