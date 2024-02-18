@@ -25,7 +25,7 @@ jobs:
 
       - name: Deploy
         run: |
-          zip -r deployment.zip log_in_s3_bucket_destroyer config/production.yaml
+          zip -r deployment.zip lambda_handler.py log_in_s3_bucket_destroyer config/production.yaml
 
           aws lambda update-function-code \
             --function-name log_in_s3_bucket_destroyer \

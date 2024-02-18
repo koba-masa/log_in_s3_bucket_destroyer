@@ -46,7 +46,3 @@ class LogInS3BucketDestroyer(Base):
                 results.append(key)
 
         return results
-
-
-def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
-    return LogInS3BucketDestroyer(event, context).execute()
