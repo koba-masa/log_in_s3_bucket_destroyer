@@ -130,6 +130,7 @@ Resources:
         Variables:
           LOG_LEVEL: INFO
           ENVIRONMENT: !Ref Environment
+          PYTHONPATH: log_in_s3_bucket_destroyer
       PackageType: Zip
       Code:
         ZipFile: |
