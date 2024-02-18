@@ -8,12 +8,7 @@ from models.aws import Base
 class Client(Base):
     def __init__(self) -> None:
         super().__init__()
-        self.client = boto3.client(
-            "s3",
-            aws_access_key_id=settings.SETTINGS["aws_access_key"],
-            aws_secret_access_key=settings.SETTINGS["aws_secret_access_key"],
-            endpoint_url=self.endpoint_url(),
-        )
+        self.client = boto3.client(**self.__options())
 
     def list_object_v2(
         self, bucket: str, prefix: str, max_per_page: int = 1000
@@ -50,3 +45,22 @@ class Client(Base):
                 Bucket=bucket,
                 Delete={"Objects": [{"Key": object} for object in objects]},
             )
+
+    def __options(self) -> Dict[str, Any]:
+        options = {
+            "service_name": "s3",
+        }
+
+        if "aws_access_key" in settings.SETTINGS:
+            options["aws_access_key_id"] = settings.SETTINGS["aws_access_key"]
+
+        if "aws_secret_access_key" in settings.SETTINGS:
+            options["aws_secret_access_key"] = settings.SETTINGS[
+                "aws_secret_access_key"
+            ]
+
+        endpoint_url = self.endpoint_url()
+        if endpoint_url is not None:
+            options["endpoint_url"] = endpoint_url
+
+        return options
