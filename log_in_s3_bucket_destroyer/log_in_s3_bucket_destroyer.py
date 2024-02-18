@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-from . import Base
+from base import Base
 from models import settings
 from models.aws.s3 import Client as S3Client
 
@@ -14,6 +14,10 @@ class LogInS3BucketDestroyer(Base):
         self.s3_client = S3Client()
 
     def execute(self) -> Dict[str, Any]:
+        if settings.SETTINGS.get("logs") is None:
+            self.logger.warning("Key 'logs' is not found in settings.")
+            return {}
+
         for config in settings.SETTINGS["logs"]:
             bucket = config["bucket"]
             prefix = config["prefix"]
@@ -46,7 +50,3 @@ class LogInS3BucketDestroyer(Base):
                 results.append(key)
 
         return results
-
-
-def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
-    return LogInS3BucketDestroyer(event, context).execute()
