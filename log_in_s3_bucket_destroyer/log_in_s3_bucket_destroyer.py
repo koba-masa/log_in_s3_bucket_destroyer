@@ -14,6 +14,10 @@ class LogInS3BucketDestroyer(Base):
         self.s3_client = S3Client()
 
     def execute(self) -> Dict[str, Any]:
+        if settings.SETTINGS.get("logs") is None:
+            self.logger.warning("Key 'logs' is not found in settings.")
+            return {}
+
         for config in settings.SETTINGS["logs"]:
             bucket = config["bucket"]
             prefix = config["prefix"]
